@@ -1,0 +1,56 @@
+<div class="group-expense-container">
+  <h2>Smart Expense Splitter</h2>
+  <form (ngSubmit)="createGroup()" #groupForm="ngForm">
+    <label>Group Name:</label>
+    <input type="text" [(ngModel)]="groupName" name="groupName" required />
+    <label>Members (comma separated emails):</label>
+    <input type="text" [(ngModel)]="memberEmails" name="memberEmails" required />
+    <button type="submit">Create Group</button>
+  </form>
+
+  <div *ngIf="groups.length">
+    <h3>Your Groups</h3>
+    <ul>
+      <li *ngFor="let group of groups" (click)="selectGroup(group)">
+        {{ group.name }} ({{ group.members.length }} members)
+      </li>
+    </ul>
+  </div>
+
+  <div *ngIf="selectedGroup">
+    <h3>Add Group Expense to {{ selectedGroup.name }}</h3>
+    <form (ngSubmit)="addExpense()" #expenseForm="ngForm">
+      <label>Description:</label>
+      <input type="text" [(ngModel)]="expenseDesc" name="expenseDesc" required />
+      <label>Amount:</label>
+      <input type="number" [(ngModel)]="expenseAmount" name="expenseAmount" required />
+      <label>Paid By (email):</label>
+      <input type="text" [(ngModel)]="paidByEmail" name="paidByEmail" required />
+      <label>Split Type:</label>
+      <select [(ngModel)]="splitType" name="splitType">
+        <option value="equal">Equal</option>
+        <option value="custom">Custom</option>
+      </select>
+      <div *ngIf="splitType === 'custom'">
+        <label>Custom Splits (email:amount, comma separated):</label>
+        <input type="text" [(ngModel)]="customSplits" name="customSplits" />
+      </div>
+      <button type="submit">Add Expense</button>
+    </form>
+
+    <h4>Group Balances</h4>
+    <button (click)="fetchBalances()">Refresh Balances</button>
+    <ul>
+      <li *ngFor="let bal of balances | keyvalue">
+        {{ bal.key }}: {{ $any(bal.value) | number:'1.2-2' }}
+      </li>
+    </ul>
+
+    <h4>Group Expenses</h4>
+    <ul>
+      <li *ngFor="let exp of groupExpenses">
+        {{ exp.description }} - ₹{{ exp.amount }} paid by {{ exp.paidBy.email || exp.paidBy }}
+      </li>
+    </ul>
+  </div>
+</div>
